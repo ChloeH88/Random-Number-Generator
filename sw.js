@@ -1,4 +1,4 @@
-const CACHE_NAME = "random-number-generator-v1";
+const CACHE_NAME = "random-number-generator-v3";
 const APP_FILES = [
   "./",
   "./index.html",

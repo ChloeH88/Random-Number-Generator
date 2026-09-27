@@ -1,4 +1,11 @@
-import { generateNumbers, InputError, parseIntegerInput } from "./random-core.mjs";
+import {
+  buildNoteNumbers,
+  formatResults,
+  generateNumbers,
+  InputError,
+  MAX_NOTE_ITEMS,
+  parseIntegerInput,
+} from "./random-core.mjs";
 
 const form = document.querySelector("#generator-form");
 const minimumInput = document.querySelector("#minimum");
@@ -10,8 +17,11 @@ const statusOutput = document.querySelector("#status");
 const errorOutput = document.querySelector("#error");
 const copyButton = document.querySelector("#copy-button");
 const generateButton = document.querySelector("#generate-button");
+const noteList = document.querySelector("#note-list");
+const noteMessage = document.querySelector("#note-message");
 
 let currentResult = "";
+const notes = new Map();
 
 function showError(message) {
   errorOutput.textContent = message;
@@ -23,6 +33,81 @@ function clearError() {
   errorOutput.textContent = "";
   errorOutput.hidden = true;
 }
+
+function showNoteMessage(message) {
+  noteList.replaceChildren();
+  noteMessage.textContent = message;
+  noteMessage.hidden = false;
+}
+
+function rebuildNoteInputs() {
+  notes.clear();
+  noteMessage.hidden = true;
+  noteMessage.textContent = "";
+  noteList.replaceChildren();
+
+  let minimum;
+  let maximum;
+  try {
+    minimum = parseIntegerInput(minimumInput.value, "最小值");
+    maximum = parseIntegerInput(maximumInput.value, "最大值");
+  } catch {
+    showNoteMessage("输入有效的最小值和最大值后，即可添加备注。");
+    return;
+  }
+
+  let noteNumbers;
+  try {
+    noteNumbers = buildNoteNumbers(minimum, maximum);
+  } catch (error) {
+    showNoteMessage(error instanceof Error ? error.message : "无法创建备注列表。");
+    return;
+  }
+
+  if (noteNumbers.length === 0) {
+    showNoteMessage(
+      `备注最多支持 ${MAX_NOTE_ITEMS} 个连续整数。你仍可正常生成纯数字结果。`,
+    );
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  for (const number of noteNumbers) {
+    const row = document.createElement("label");
+    row.className = "note-row";
+
+    const numberLabel = document.createElement("span");
+    numberLabel.className = "note-number";
+    numberLabel.textContent = String(number);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "note-input";
+    input.dataset.number = String(number);
+    input.autocomplete = "off";
+    input.placeholder = `填写 ${number} 对应的选项`;
+    input.setAttribute("aria-label", `数字 ${number} 的备注`);
+
+    row.append(numberLabel, input);
+    fragment.append(row);
+  }
+  noteList.append(fragment);
+}
+
+noteList.addEventListener("input", (event) => {
+  const input = event.target.closest(".note-input");
+  if (!input) return;
+
+  const number = Number(input.dataset.number);
+  if (input.value.trim()) {
+    notes.set(number, input.value);
+  } else {
+    notes.delete(number);
+  }
+});
+
+minimumInput.addEventListener("input", rebuildNoteInputs);
+maximumInput.addEventListener("input", rebuildNoteInputs);
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -40,7 +125,7 @@ form.addEventListener("submit", (event) => {
       allowDuplicatesInput.checked,
     );
 
-    currentResult = numbers.join(", ");
+    currentResult = formatResults(numbers, notes);
     resultOutput.textContent = currentResult;
     resultOutput.classList.remove("empty");
     copyButton.disabled = false;
@@ -103,3 +188,5 @@ if ("serviceWorker" in navigator) {
     });
   });
 }
+
+rebuildNoteInputs();

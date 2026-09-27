@@ -1,4 +1,5 @@
 export const MAX_COUNT = 1000;
+export const MAX_NOTE_ITEMS = 20;
 
 export class InputError extends Error {
   constructor(message) {
@@ -98,4 +99,28 @@ export function parseIntegerInput(rawValue, label) {
   const parsed = Number(value);
   requireSafeInteger(parsed, label);
   return parsed;
+}
+
+export function buildNoteNumbers(minimum, maximum) {
+  requireSafeInteger(minimum, "最小值");
+  requireSafeInteger(maximum, "最大值");
+  if (minimum > maximum) {
+    throw new InputError("最小值不能大于最大值。");
+  }
+
+  const rangeSize = BigInt(maximum) - BigInt(minimum) + 1n;
+  if (rangeSize > BigInt(MAX_NOTE_ITEMS)) {
+    return [];
+  }
+
+  return Array.from({ length: Number(rangeSize) }, (_, index) => minimum + index);
+}
+
+export function formatResults(numbers, notes = new Map()) {
+  return numbers
+    .map((number) => {
+      const note = String(notes.get(number) ?? "").trim();
+      return note ? `${number} — ${note}` : String(number);
+    })
+    .join("\n");
 }
