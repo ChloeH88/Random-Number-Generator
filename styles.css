@@ -228,10 +228,15 @@ input:not([type="checkbox"]):focus {
 
 .primary-button {
   width: 100%;
+  min-height: 56px;
   color: #fff;
   background: linear-gradient(135deg, #486be5, #2948bd);
   box-shadow: 0 9px 20px rgba(49, 87, 213, 0.25);
   font-size: 17px;
+}
+
+.primary-action {
+  margin-top: 18px;
 }
 
 .primary-button:active {

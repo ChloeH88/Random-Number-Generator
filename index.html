@@ -56,8 +56,6 @@
             <input id="allow-duplicates" type="checkbox" checked>
             <span class="switch" aria-hidden="true"></span>
           </label>
-
-          <button id="generate-button" class="primary-button" type="submit">生成随机数</button>
         </form>
 
         <section class="note-card" aria-labelledby="note-heading">
@@ -70,6 +68,10 @@
           <div id="note-list" class="note-list" aria-live="polite"></div>
           <p id="note-message" class="note-message" hidden></p>
         </section>
+      </div>
+
+      <div class="primary-action">
+        <button id="generate-button" class="primary-button" type="submit" form="generator-form">生成随机数</button>
       </div>
 
       <section class="result-card" aria-labelledby="result-heading">
