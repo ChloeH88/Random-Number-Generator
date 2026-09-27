@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#3157d5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="随机数生成器">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    >
+    <title>随机整数生成器</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="app-mark" aria-hidden="true">#</div>
+        <div>
+          <p class="eyebrow">私密·本地生成</p>
+          <h1>随机整数生成器</h1>
+        </div>
+      </header>
+
+      <form id="generator-form" class="generator-card" novalidate>
+        <div class="range-fields">
+          <label>
+            <span>最小值</span>
+            <input id="minimum" name="minimum" value="1" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
+          </label>
+          <label>
+            <span>最大值</span>
+            <input id="maximum" name="maximum" value="100" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
+          </label>
+        </div>
+
+        <label>
+          <span>生成数量 <small>（最多 1,000）</small></span>
+          <input id="count" name="count" value="10" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+        </label>
+
+        <label class="switch-row">
+          <span>
+            <strong>允许重复</strong>
+            <small>每次独立抽取数字</small>
+          </span>
+          <input id="allow-duplicates" type="checkbox" checked>
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <button id="generate-button" class="primary-button" type="submit">生成随机数</button>
+      </form>
+
+      <section class="result-card" aria-labelledby="result-heading">
+        <div class="result-heading-row">
+          <h2 id="result-heading">生成结果</h2>
+          <button id="copy-button" class="copy-button" type="button" disabled>复制</button>
+        </div>
+        <output id="result" class="result empty">点击“生成随机数”后，结果会显示在这里。</output>
+      </section>
+
+      <p id="error" class="message error" role="alert" hidden></p>
+      <p id="status" class="message status" role="status" aria-live="polite"></p>
+      <p class="privacy-note">数字只在这台设备上生成，不会被上传或保存。</p>
+    </main>
+  </body>
+</html>

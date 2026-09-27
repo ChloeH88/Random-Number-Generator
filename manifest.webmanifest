@@ -1,0 +1,25 @@
+{
+  "name": "随机整数生成器",
+  "short_name": "随机数生成器",
+  "description": "在设备本地生成指定范围内的随机整数。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf2ff",
+  "theme_color": "#3157d5",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
