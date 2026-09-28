@@ -1,5 +1,5 @@
 export const MAX_COUNT = 1000;
-export const MAX_NOTE_ITEMS = 20;
+export const MAX_OPTIONS = 100;
 
 export class InputError extends Error {
   constructor(message) {
@@ -11,6 +11,18 @@ export class InputError extends Error {
 function requireSafeInteger(value, label) {
   if (!Number.isSafeInteger(value)) {
     throw new InputError(`${label}必须是安全范围内的整数。`);
+  }
+}
+
+function requireOptions(options) {
+  if (!Array.isArray(options)) {
+    throw new TypeError("随机选项必须使用数组。");
+  }
+  if (options.length < 1) {
+    throw new InputError("至少需要保留一个随机选项。");
+  }
+  if (options.length > MAX_OPTIONS) {
+    throw new InputError(`最多只能添加 ${MAX_OPTIONS} 个随机选项。`);
   }
 }
 
@@ -70,8 +82,7 @@ export function generateNumbers(
     );
   }
 
-  // Partial Fisher-Yates sampling. The map stores only the positions that were
-  // swapped, so a very large number range still uses O(count) memory.
+  // Partial Fisher-Yates sampling keeps memory use proportional to count.
   const swaps = new Map();
   const results = [];
   for (let index = 0n; index < BigInt(count); index += 1n) {
@@ -101,26 +112,41 @@ export function parseIntegerInput(rawValue, label) {
   return parsed;
 }
 
-export function buildNoteNumbers(minimum, maximum) {
-  requireSafeInteger(minimum, "最小值");
-  requireSafeInteger(maximum, "最大值");
-  if (minimum > maximum) {
-    throw new InputError("最小值不能大于最大值。");
+export function addOption(options) {
+  requireOptions(options);
+  if (options.length >= MAX_OPTIONS) {
+    throw new InputError(`最多只能添加 ${MAX_OPTIONS} 个随机选项。`);
   }
-
-  const rangeSize = BigInt(maximum) - BigInt(minimum) + 1n;
-  if (rangeSize > BigInt(MAX_NOTE_ITEMS)) {
-    return [];
-  }
-
-  return Array.from({ length: Number(rangeSize) }, (_, index) => minimum + index);
+  return [...options, ""];
 }
 
-export function formatResults(numbers, notes = new Map()) {
+export function removeOptionAt(options, index) {
+  requireOptions(options);
+  requireSafeInteger(index, "选项位置");
+  if (index < 0 || index >= options.length) {
+    throw new InputError("要删除的随机选项不存在。");
+  }
+  if (options.length === 1) {
+    throw new InputError("至少需要保留一个随机选项。");
+  }
+  return options.filter((_, optionIndex) => optionIndex !== index);
+}
+
+export function resetOptions(options) {
+  requireOptions(options);
+  return [""];
+}
+
+export function formatOptionResults(numbers, options) {
+  requireOptions(options);
   return numbers
     .map((number) => {
-      const note = String(notes.get(number) ?? "").trim();
-      return note ? `${number} — ${note}` : String(number);
+      requireSafeInteger(number, "选项编号");
+      if (number < 1 || number > options.length) {
+        throw new InputError("生成结果包含不存在的随机选项。");
+      }
+      const option = String(options[number - 1] ?? "").trim();
+      return option ? `${number} — ${option}` : String(number);
     })
     .join("\n");
 }

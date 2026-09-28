@@ -1,7 +1,7 @@
 {
-  "name": "随机整数生成器",
-  "short_name": "随机数生成器",
-  "description": "在设备本地生成指定范围内的随机整数。",
+  "name": "随机选择器",
+  "short_name": "随机选择器",
+  "description": "在设备本地生成随机整数或从自定义选项中随机选择。",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",

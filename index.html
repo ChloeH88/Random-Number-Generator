@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#3157d5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="随机数生成器">
+    <meta name="apple-mobile-web-app-title" content="随机生成器">
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
     >
-    <title>随机整数生成器</title>
+    <title>随机生成器</title>
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
@@ -21,70 +21,106 @@
   <body>
     <main class="app-shell">
       <header class="app-header">
-        <div class="app-mark" aria-hidden="true">#</div>
         <div>
           <p class="eyebrow">私密·本地生成</p>
-          <h1>随机整数生成器</h1>
+          <h1>随机生成器</h1>
         </div>
       </header>
 
-      <div class="workspace-grid">
-        <form id="generator-form" class="generator-card" novalidate>
-          <h2>生成设置</h2>
+      <div class="tabs" role="tablist" aria-label="随机模式">
+        <button id="integer-tab" class="tab-button" type="button" role="tab" aria-selected="true" aria-controls="integer-panel" tabindex="0">随机整数</button>
+        <button id="option-tab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="option-panel" tabindex="-1">随机选项</button>
+      </div>
 
+      <section id="integer-panel" class="tab-panel" role="tabpanel" aria-labelledby="integer-tab">
+        <form id="integer-form" class="settings-card" novalidate>
+          <h2>生成设置</h2>
           <div class="range-fields">
             <label>
               <span>最小值</span>
-              <input id="minimum" name="minimum" value="1" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
+              <input id="integer-minimum" name="minimum" value="1" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
             </label>
             <label>
               <span>最大值</span>
-              <input id="maximum" name="maximum" value="13" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
+              <input id="integer-maximum" name="maximum" value="13" inputmode="numeric" pattern="-?[0-9]*" autocomplete="off">
             </label>
           </div>
-
           <label>
             <span>生成数量 <small>（最多 1,000）</small></span>
-            <input id="count" name="count" value="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+            <input id="integer-count" name="count" value="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
           </label>
-
           <label class="switch-row">
             <span>
               <strong>允许重复</strong>
               <small>每次独立抽取数字</small>
             </span>
-            <input id="allow-duplicates" type="checkbox">
+            <input id="integer-allow-duplicates" type="checkbox">
             <span class="switch" aria-hidden="true"></span>
           </label>
         </form>
 
-        <section class="note-card" aria-labelledby="note-heading">
-          <div class="note-heading-row">
-            <div>
-              <h2 id="note-heading">数字备注（选填）</h2>
-              <p>为范围内的数字填写对应选项（最多 20 项）</p>
-            </div>
-          </div>
-          <div id="note-list" class="note-list" aria-live="polite"></div>
-          <p id="note-message" class="note-message" hidden></p>
-        </section>
-      </div>
-
-      <div class="primary-action">
-        <button id="generate-button" class="primary-button" type="submit" form="generator-form">生成随机数</button>
-      </div>
-
-      <section class="result-card" aria-labelledby="result-heading">
-        <div class="result-heading-row">
-          <h2 id="result-heading">生成结果</h2>
-          <button id="copy-button" class="copy-button" type="button" disabled>复制</button>
+        <div class="primary-action">
+          <button id="integer-generate-button" class="primary-button" type="submit" form="integer-form">生成随机数</button>
         </div>
-        <output id="result" class="result empty">点击“生成随机数”后，结果会显示在这里。</output>
+
+        <section class="result-card" aria-labelledby="integer-result-heading">
+          <div class="result-heading-row">
+            <h2 id="integer-result-heading">生成结果</h2>
+            <button id="integer-copy-button" class="copy-button" type="button" disabled>复制</button>
+          </div>
+          <output id="integer-result" class="result empty">点击“生成随机数”后，结果会显示在这里。</output>
+        </section>
+        <p id="integer-error" class="message error" role="alert" hidden></p>
+        <p id="integer-status" class="message status" role="status" aria-live="polite"></p>
       </section>
 
-      <p id="error" class="message error" role="alert" hidden></p>
-      <p id="status" class="message status" role="status" aria-live="polite"></p>
-      <p class="privacy-note">数字只在这台设备上生成，不会被上传或保存。</p>
+      <section id="option-panel" class="tab-panel" role="tabpanel" aria-labelledby="option-tab" hidden>
+        <form id="option-form" class="option-card" aria-labelledby="option-heading" novalidate>
+          <div class="card-heading-row">
+            <div>
+              <h2 id="option-heading">随机选项</h2>
+              <p>默认 1 个，最多 100 个</p>
+            </div>
+            <button id="option-reset-button" class="secondary-button" type="button" disabled>重置</button>
+          </div>
+          <div id="option-list" class="option-list" aria-live="polite"></div>
+          <button id="option-add-button" class="add-button" type="button">＋ 添加选项</button>
+
+          <section class="option-settings-section" aria-labelledby="option-settings-heading">
+            <h2 id="option-settings-heading">生成设置</h2>
+            <div class="option-settings-grid">
+              <label>
+                <span>生成数量 <small>（最多 1,000）</small></span>
+                <input id="option-count" name="count" value="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+              </label>
+              <label class="switch-row">
+                <span>
+                  <strong>允许重复</strong>
+                  <small>每次独立抽取选项</small>
+                </span>
+                <input id="option-allow-duplicates" type="checkbox">
+                <span class="switch" aria-hidden="true"></span>
+              </label>
+            </div>
+          </section>
+        </form>
+
+        <div class="primary-action">
+          <button id="option-generate-button" class="primary-button" type="submit" form="option-form">生成随机选项</button>
+        </div>
+
+        <section class="result-card" aria-labelledby="option-result-heading">
+          <div class="result-heading-row">
+            <h2 id="option-result-heading">生成结果</h2>
+            <button id="option-copy-button" class="copy-button" type="button" disabled>复制</button>
+          </div>
+          <output id="option-result" class="result empty">点击“生成随机选项”后，结果会显示在这里。</output>
+        </section>
+        <p id="option-error" class="message error" role="alert" hidden></p>
+        <p id="option-status" class="message status" role="status" aria-live="polite"></p>
+      </section>
+
+      <p class="privacy-note">内容只在这台设备上生成，不会被上传或保存。</p>
     </main>
   </body>
 </html>
